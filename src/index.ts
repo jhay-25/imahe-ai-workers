@@ -16,8 +16,9 @@ app.use(
   '*',
   cors({
     origin: [
-      'http://localhost:3000',
-      'http://localhost:8787',
+      ...(process.env.NODE_ENV === 'development'
+        ? ['http://localhost:3000', 'http://localhost:8787']
+        : []),
       'https://imahe.codingjohn.dev'
     ]
   })
