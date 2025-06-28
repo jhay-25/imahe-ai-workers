@@ -8,9 +8,18 @@ type R2Env = {
   R2_SECRET_ACCESS_KEY: string
 }
 
-export const getR2 = (c: Context) => {
+export const getR2 = (c: Context): S3Client => {
   return c.get('r2')
 }
+
+export const r2 = new S3Client({
+  region: 'auto',
+  endpoint: process.env.R2_ENDPOINT!,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!
+  }
+})
 
 export const r2Middleware: MiddlewareHandler = async (c, next) => {
   const r2Env = env<R2Env>(c)

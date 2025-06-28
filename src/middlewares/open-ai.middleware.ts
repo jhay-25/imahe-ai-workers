@@ -1,7 +1,7 @@
 import type { Context, MiddlewareHandler } from 'hono'
 import { OpenAI } from 'openai'
 
-export const getOpenAi = (c: Context) => {
+export const getOpenAi = (c: Context): OpenAI => {
   return c.get('openai')
 }
 

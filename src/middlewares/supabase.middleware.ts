@@ -1,14 +1,20 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Context, MiddlewareHandler } from 'hono'
 import { env } from 'hono/adapter'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 type SupabaseEnv = {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY: string
 }
-export const getSupabase = (c: Context) => {
+export const getSupabase = (c: Context): SupabaseClient => {
   return c.get('supabase')
 }
+
+export const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export const supabaseMiddleware: MiddlewareHandler = async (c, next) => {
   const supabaseEnv = env<SupabaseEnv>(c)
