@@ -9,6 +9,14 @@ export interface Bindings {
   SUPABASE_URL: string
   SUPABASE_SERVICE_ROLE_KEY: string
   NODE_ENV: string
+  RATE_LIMITER: RateLimit
+}
+
+export type AppType = {
+  Variables: {
+    rateLimit: boolean
+  }
+  Bindings: Bindings
 }
 
 export interface ImageObj {

@@ -17,10 +17,22 @@ import {
   DeleteObjectCommand
 } from '@aws-sdk/client-s3'
 import { r2 } from './middlewares/r2.middleware'
-import { ImageObj, Bindings } from './interface'
-import { ImagesResponse } from 'openai/resources'
+import type { ImageObj, AppType } from './interface'
+import { cloudflareRateLimiter } from '@hono-rate-limiter/cloudflare'
 
-const app = new Hono<{ Bindings: Bindings }>().basePath('/api/v1')
+const app = new Hono<AppType>().basePath('/api/v1')
+
+app.use(
+  cloudflareRateLimiter<AppType>({
+    rateLimitBinding: (c) => c.env.RATE_LIMITER,
+    keyGenerator: (c) => {
+      const { apiKey } = c.req.query()
+      console.log('cf-connecting-ip: ', c.req.header('cf-connecting-ip'))
+
+      return apiKey ?? c.req.header('cf-connecting-ip') ?? ''
+    }
+  })
+)
 
 app.get('/', async (c) => {
   return c.json({ message: 'Server is up and running. 👋' })
@@ -46,7 +58,8 @@ app.post('/generations', async (c) => {
     const supabase = getSupabase(c)
     const r2 = getR2(c)
 
-    const { prompt, model } = await c.req.json()
+    const { prompt, model }: Pick<ImageObj, 'prompt' | 'model'> =
+      await c.req.json()
 
     const img = await openai.images.generate({
       model,
